@@ -1,0 +1,192 @@
+[gd_scene load_steps=9 format=3 uid="uid://8hioymtgplbq"]
+
+[ext_resource type="Script" path="res://thread.gd" id="1_ov48j"]
+[ext_resource type="Script" path="res://host.gd" id="1_y755y"]
+[ext_resource type="Script" path="res://javarefresh.gd" id="2_lxp6l"]
+[ext_resource type="Script" path="res://webget.gd" id="3_0cfyf"]
+[ext_resource type="Script" path="res://jvinstall.gd" id="3_yhhgk"]
+[ext_resource type="Script" path="res://mem.gd" id="4_10jx5"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_5l1bo"]
+font_size = 20
+outline_color = Color(0, 0, 0, 1)
+shadow_size = 5
+shadow_color = Color(0, 0, 0, 0.647059)
+shadow_offset = Vector2(0, 1)
+
+[sub_resource type="GDScript" id="GDScript_j4jdl"]
+script/source = "extends Node
+@onready var java_8_ds: Label = $\"../Javastatus/Java8\"
+@onready var java_11_ds: Label = $\"../Javastatus/Java11\"
+@onready var java_17_ds: Label = $\"../Javastatus/Java17\"
+@onready var java_21_ds: Label = $\"../Javastatus/Java21\"
+
+var host_statusdisplay: String #the text for display
+var java_verify
+
+func _ready() -> void:
+	java_verif()
+
+func java_verif(): # verify if java is instaled
+	var verify_temp: Array
+
+	for java_ver in Utils.java_versions: #simple verification
+		java_status_display(java_ver, 2)
+		var java_exe_ver = FileAccess.file_exists(\"./java/java\"+java_ver+\"/java.exe\")
+		var javaw_exe_ver = FileAccess.file_exists(\"./java/java\"+java_ver+\"/javaw.exe\")
+		var java_zip_ver = FileAccess.file_exists(\"./java/java\"+java_ver+\"_down.zip\") # .zip is the curl output
+
+		if java_exe_ver and javaw_exe_ver and !java_zip_ver == true:
+			verify_temp.append(true)
+			java_status_display(java_ver, 0)
+		else:
+			verify_temp.append(false)
+			java_status_display(java_ver, 1)
+		# verify_temp is the boolean colection of all java verifications
+
+#		print(java_exe_ver, javaw_exe_ver, java_zip_ver)
+#		print(verify_temp)
+
+	# the final words
+	if verify_temp.has(false):
+		java_verify = false # reinstall the java
+	else:
+		java_verify = true # ignores the download
+	return java_verify
+
+func java_status_display(java_type: String, status: int):
+	var text_display: String
+#	print(java_type, status)
+
+	if status == 0:
+		text_display = \"Pronto\"
+	elif status == 1:
+		text_display = \"Error\"
+	elif status == 2:
+		text_display = \"Verificando\"
+	elif status == 3:
+		text_display = \"Instalando\"
+	
+	if java_type == \"8\" and java_8_ds:
+		java_8_ds.text = \"Java8 = \" + text_display
+	elif java_type == \"11\" and java_11_ds:
+		java_11_ds.text = \"Java11 = \" + text_display
+	elif java_type == \"17\" and java_17_ds:
+		java_17_ds.text = \"Java17 = \" + text_display
+	elif java_type == \"21\" and java_21_ds:
+		java_21_ds.text = \"Java21 = \" + text_display
+
+
+func _on_javarefresh_pressed() -> void:
+	java_verif()
+"
+
+[node name="Control" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -1.0
+offset_right = -1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Status" type="Label" parent="."]
+layout_mode = 0
+offset_left = 32.0
+offset_top = 336.0
+offset_right = 1136.0
+offset_bottom = 375.0
+label_settings = SubResource("LabelSettings_5l1bo")
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="javarefresh" type="Button" parent="."]
+layout_mode = 0
+offset_left = 17.0
+offset_top = 144.0
+offset_right = 153.0
+offset_bottom = 176.0
+text = "Atualizar"
+
+[node name="javainstall" type="Button" parent="."]
+layout_mode = 0
+offset_left = 17.0
+offset_top = 192.0
+offset_right = 153.0
+offset_bottom = 224.0
+text = "Instalar"
+
+[node name="iniciar" type="Button" parent="."]
+layout_mode = 0
+offset_left = 16.0
+offset_top = 512.0
+offset_right = 1136.0
+offset_bottom = 624.0
+text = "Iniciar Minecraft"
+
+[node name="host" type="Button" parent="."]
+layout_mode = 0
+offset_left = 16.0
+offset_top = 384.0
+offset_right = 1136.0
+offset_bottom = 496.0
+text = "Hostear"
+
+[node name="Thread" type="Node" parent="."]
+script = ExtResource("1_ov48j")
+
+[node name="Host_script" type="Node" parent="."]
+script = ExtResource("1_y755y")
+
+[node name="webget" type="Node" parent="."]
+script = ExtResource("3_0cfyf")
+
+[node name="Java_Script" type="Node" parent="."]
+script = ExtResource("2_lxp6l")
+
+[node name="install" type="Node" parent="Java_Script"]
+script = ExtResource("3_yhhgk")
+
+[node name="mem" type="Node" parent="Java_Script"]
+script = ExtResource("4_10jx5")
+
+[node name="Timer" type="Timer" parent="Java_Script"]
+wait_time = 3.0
+autostart = true
+
+[node name="Javastatus" type="Node" parent="."]
+script = SubResource("GDScript_j4jdl")
+
+[node name="Java8" type="Label" parent="Javastatus"]
+offset_left = 16.0
+offset_top = 16.0
+offset_right = 288.0
+offset_bottom = 39.0
+text = "Java8"
+
+[node name="Java11" type="Label" parent="Javastatus"]
+offset_left = 16.0
+offset_top = 48.0
+offset_right = 288.0
+offset_bottom = 71.0
+text = "Java11"
+
+[node name="Java17" type="Label" parent="Javastatus"]
+offset_left = 16.0
+offset_top = 80.0
+offset_right = 288.0
+offset_bottom = 103.0
+text = "Java17"
+
+[node name="Java21" type="Label" parent="Javastatus"]
+offset_left = 16.0
+offset_top = 112.0
+offset_right = 288.0
+offset_bottom = 135.0
+text = "Java21"
+
+[connection signal="pressed" from="javarefresh" to="Javastatus" method="_on_javarefresh_pressed"]
+[connection signal="pressed" from="javainstall" to="Java_Script/install" method="_on_javainstall_pressed"]
+[connection signal="pressed" from="host" to="Host_script" method="_on_host_pressed"]
+[connection signal="timeout" from="Java_Script/Timer" to="Java_Script" method="_on_timer_timeout"]

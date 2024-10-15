@@ -1,4 +1,8 @@
-# MC-Games-Browser
+# Koto Launcher (Proof of concept)
+**this is now a "work in progress" proof of the concept down below! maybe not all that is writed on this is going to be implemented!**
+
+if you like the ideia and want this to get real, support me on ko-fi/lokopeto
+
 This is a concept of a new type of Minecraft Launcher, it is like a server browser, but, you download the files of the server and self-host on your machine for your friends to play, with security and almost no configuration at all!  
 
 And will allow no host cost for the developer (no need for pay-to-win), no high ping, multilingual, save system, and a lot of new possibilities.  
